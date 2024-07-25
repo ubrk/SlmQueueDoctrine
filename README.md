@@ -7,14 +7,11 @@ Important notice
 **We decided to move onto Symfony Messenger and we are therefore not maintaining this repository anymore. Feel free to fork it and
 make it your own.**
 
-[![Latest Stable Version](https://poser.pugx.org/slm/queue-doctrine/v/stable.png)](https://packagist.org/packages/slm/queue-doctrine)
-[![Latest Unstable Version](https://poser.pugx.org/slm/queue-doctrine/v/unstable.png)](https://packagist.org/packages/slm/queue-doctrine)
-
 Created by Stefan Kleff
 
 Requirements
 ------------
-* [SlmQueue](https://github.com/JouwWeb/SlmQueue)
+* [SlmQueue](https://github.com/ubrk/SlmQueue)
 * [Doctrine 2 ORM Module](https://github.com/doctrine/DoctrineORMModule) or [roave/psr-container-doctrine](https://github.com/roave/psr-container-doctrine)
 
 Note: it's necessary require the doctrine package in composer.json file.
@@ -22,18 +19,33 @@ Note: it's necessary require the doctrine package in composer.json file.
 Installation
 ------------
 
-Run `composer require slm/queue-doctrine`.
+To install this fork, adds the new repositories to your `composer.json` file
+
+```json
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/ubrk/SlmQueue"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/ubrk/SlmQueueDoctrine"
+    }
+  ]
+```
+
+Then, run `composer require slm/queue-doctrine`.
 
 If you have the [laminas/laminas-component-installer](https://github.com/laminas/laminas-component-installer) package installed, it will ask you to enable the module (and `SlmQueue`), both in Laminas and Mezzio. Otherwise, add the module to the list:
 * in Laminas MVC, enable the module by adding `SlmQueueDoctrine` in your application.config.php file.
 * in Mezzio, enable the module by adding `SlmQueueDoctrine\ConfigProvider::class,` in your config.php file.
 
-Note: Don't forget install [SlmQueue](https://github.com/JouwWeb/SlmQueue) in you config file, which is required.
+Note: Don't forget install [SlmQueue](https://github.com/ubrk/SlmQueue) in you config file, which is required.
 
 Documentation
 -------------
 
-Before reading SlmQueueDoctrine documentation, please read [SlmQueue documentation](https://github.com/JouwWeb/SlmQueue).
+Before reading SlmQueueDoctrine documentation, please read [SlmQueue documentation](https://github.com/ubrk/SlmQueue/blob/master/docs/1.Introduction.md).
 
 ### Configuring the connection
 

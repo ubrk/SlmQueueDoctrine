@@ -80,28 +80,37 @@ class DoctrineQueue extends AbstractQueue implements DoctrineQueueInterface
         );
         $scheduled = $this->parseOptionsToDateTime($options);
 
-        $this->connection->insert($this->options->getTableName(), [
+        $data = [
             'queue'     => $this->getName(),
             'status'    => self::STATUS_PENDING,
             'created'   => $this->now->format('Y-m-d H:i:s.u'),
             'data'      => $this->serializeJob($job),
             'scheduled' => $scheduled->format('Y-m-d H:i:s.u'),
             'priority'  => isset($options['priority']) ? $options['priority'] : self::DEFAULT_PRIORITY,
-        ], [
-            Types::STRING,
-            Types::SMALLINT,
-            Types::STRING,
-            Types::TEXT,
-            Types::STRING,
-            Types::INTEGER,
-        ]);
+        ];
+        
+        if (self::DATABASE_PLATFORM_POSTGRES == $this->connection->getDatabasePlatform()->getName()) 
+        {
+            $sql = $this->connection->getDatabasePlatform()->getSequenceNextValSQL($this->options->getTableName() . '_id_seq');
 
-        if (self::DATABASE_PLATFORM_POSTGRES == $this->connection->getDatabasePlatform()->getName()) {
-            $id = $this->connection->lastInsertId($this->options->getTableName() . '_id_seq');
-        } else {
-            $id = $this->connection->lastInsertId();
+            /** @var \Doctrine\DBAL\Result $id **/
+            $id = $this->connection->executeQuery($sql)->fetchOne();
+            $data["id"] = $id;
         }
+        
+        /** \Doctrine\DBAL\Connection $connection **/
+        $this->connection->insert($this->getOptions()->getTableName(), 
+            $data, 
+            [
+                Types::STRING,
+                Types::SMALLINT,
+                Types::STRING,
+                Types::TEXT,
+                Types::STRING,
+                Types::INTEGER,
+            ]);
 
+        $id = $this->connection->lastInsertId();
         $job->setId($id);
     }
 
@@ -151,7 +160,7 @@ class DoctrineQueue extends AbstractQueue implements DoctrineQueueInterface
                 $queryBuilder->getParameterTypes()
             );
 
-            if ($row = $query->fetch()) {
+            if ($row = $query->fetchAssociative()) {
                 $update = 'UPDATE ' . $this->options->getTableName() . ' ' .
                     'SET status = ?, executed = ? ' .
                     'WHERE id = ? AND status = ?';
